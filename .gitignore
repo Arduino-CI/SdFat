@@ -1,3 +1,10 @@
+Gemfile.lock
+.bundle
+vendor
+*.cpp.bin*
+.vscode
+libarduino.so*
+
 #################
 ## Eclipse
 #################
