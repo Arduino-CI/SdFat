@@ -18,25 +18,29 @@ const uint8_t LS_R = 0x08;    // ls() flag for recursive list of subdirectories.
 #define O_ACCMODE (O_RDONLY | O_WRONLY | O_RDWR) ///< Mask for access mode.
 typedef uint8_t oflag_t;
 
-class File32_CI {
+class File_CI {
 public:
+  File_CI(String name, String contents);
   uint32_t available32() const;
-  // bool close();
-  // void flush();
-  // size_t getName(char *name, size_t size);
-  // const char *name() const;
-  // uint32_t position() const;
-  // int read();
-  // int read(void *buf, size_t count);
-  // void rewind();
-  // bool seek(uint32_t pos);
-  // uint32_t size() const;
-  // bool truncate(uint32_t length = 0);
-  // size_t write(const char *str);
-  // size_t write(const uint8_t *buffer, size_t size);
-  // size_t write uint8_t b);
+  bool close();
+  void flush();
+  size_t getName(char *name, size_t size);
+  const char *name() const;
+  uint32_t position() const;
+  int read();
+  int read(void *buf, size_t count);
+  void rewind();
+  bool seek(uint32_t pos);
+  bool seekEnd(int32_t offset = 0);
+  uint32_t size() const;
+  bool truncate();
+  bool truncate(uint32_t length);
+  size_t write(const char *str);
 
 private:
+  String _contents;
+  String _name;
+  uint32_t _position = 0;
 };
 
 class SdFat_CI {
@@ -51,8 +55,8 @@ public:
   // bool ls(uint8_t flags = 0);
   // bool mkdir(const char *path);
   // bool mkdir(const String &path);
-  // File32_CI open(const char *path, oflag_t oflag = 0x00);
-  // File32_CI open(const String &path, oflag_t oflag = 0x00);
+  // File_CI open(const char *path, oflag_t oflag = 0x00);
+  // File_CI open(const String &path, oflag_t oflag = 0x00);
   // bool remove(const char *path);
   // bool remove(const String &path);
   // bool rmdir(const char *path);
