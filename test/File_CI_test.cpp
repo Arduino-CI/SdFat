@@ -17,7 +17,10 @@ unittest(available32) {
 unittest(close) {
   file_ci _file(String("Genesis"), "In the beginning God");
   File_CI file(&_file);
+  assertTrue(file);
   assertTrue(file.close());
+  assertFalse(file);
+  assertFalse(file.close());
 }
 
 unittest(flush) {

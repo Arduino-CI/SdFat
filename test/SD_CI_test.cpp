@@ -19,7 +19,7 @@ unittest_teardown() { sd.format(); }
 
 unittest(begin) { assertTrue(sd.begin(0)); }
 
-unittest(chdir_exists_mkdir_rmdir) {
+unittest(directory_operations) {
   assertEqual("/", sd._getCwd());
   assertTrue(sd.chdir());
   assertEqual("/", sd._getCwd());
@@ -51,6 +51,11 @@ unittest(chdir_exists_mkdir_rmdir) {
   assertTrue(sd.rmdir("/foo/bar"));
   assertTrue(sd.rmdir("/foo"));
   assertEqual("/", sd._getCwd());
+}
+
+unittest(fail_if_file_does_not_exist) {
+  File_CI file = sd.open("foo.txt");
+  assertFalse(file);
 }
 
 unittest(format) { assertTrue(sd.format()); }

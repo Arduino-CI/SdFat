@@ -8,7 +8,15 @@
 char *__brkval = nullptr;
 char __bss_end = 0;
 
-String SdFat_CI::_normalizePath(String inPath) {
+String SdFat_CI::_normalizeDirPath(String inPath) {
+  String outPath = _normalizeFilePath(inPath);
+  if (!outPath.endsWith("/")) {
+    outPath.concat('/');
+  }
+  return outPath;
+}
+
+String SdFat_CI::_normalizeFilePath(String inPath) {
   String outPath;
   if (inPath.length() == 0 || inPath == "/") {
     return String("/");
@@ -18,9 +26,6 @@ String SdFat_CI::_normalizePath(String inPath) {
   } else {
     outPath = _cwd;
     outPath.concat(inPath);
-  }
-  if (!outPath.endsWith("/")) {
-    outPath.concat('/');
   }
   return outPath;
 }
@@ -42,7 +47,7 @@ bool SdFat_CI::chdir(const char *path) { return this->chdir(String(path)); }
 
 bool SdFat_CI::chdir(const String &path) {
   assert(_didBegin);
-  String newPath = this->_normalizePath(path);
+  String newPath = this->_normalizeDirPath(path);
   if (dirs.count(newPath)) {
     _cwd = newPath;
     return true;
@@ -54,10 +59,7 @@ bool SdFat_CI::exists(const char *path) { return this->exists(String(path)); }
 
 bool SdFat_CI::exists(const String &path) {
   assert(_didBegin);
-  if (dirs.count(this->_normalizePath(path))) {
-    return true;
-  }
-  return false;
+  return dirs.count(this->_normalizeDirPath(path)) == 1;
 }
 
 bool SdFat_CI::format() {
@@ -75,7 +77,7 @@ bool SdFat_CI::mkdir(const char *path, bool pFlag) {
 
 bool SdFat_CI::mkdir(const String &path, bool pFlag) {
   assert(_didBegin);
-  String newPath = this->_normalizePath(path);
+  String newPath = this->_normalizeDirPath(path);
   if (dirs.count(newPath)) {
     return false;
   }
@@ -94,9 +96,28 @@ bool SdFat_CI::mkdir(const String &path, bool pFlag) {
   return true;
 }
 
-// File_CI SdFat_CI::open(const char *path, oflag_t oflag = 0x00);
+File_CI SdFat_CI::open(const char *path, oflag_t oflag) {
+  return open(String(path), oflag);
+}
 
-// File_CI SdFat_CI::open(const String &path, oflag_t oflag = 0x00);
+/*
+#define O_RDONLY 0x00 ///< Open for reading only.
+#define O_WRONLY 0x01 ///< Open for writing only.
+#define O_RDWR 0x02   ///< Open for reading and writing.
+#define O_AT_END 0x04 ///< Open at EOF.
+#define O_APPEND 0x08 ///< Set append mode.
+#define O_CREAT 0x10  ///< Create file if it does not exist.
+#define O_TRUNC 0x20  ///< Truncate file to zero length.
+#define O_EXCL 0x40   ///< Fail if the file exists.
+*/
+File_CI SdFat_CI::open(const String &path, oflag_t oflag) {
+  String fullPath = _normalizeFilePath(path);
+  if (this->exists(fullPath)) {
+    if (oflag & O_EXCL) {
+      return File_CI(nullptr);
+    }
+  }
+}
 
 bool SdFat_CI::remove(const char *path) { return this->remove(String(path)); }
 
@@ -106,7 +127,7 @@ bool SdFat_CI::rmdir(const char *path) { return this->rmdir(String(path)); }
 
 bool SdFat_CI::rmdir(const String &path) {
   assert(_didBegin);
-  String newPath = this->_normalizePath(path);
+  String newPath = this->_normalizeDirPath(path);
   if (!dirs.count(newPath)) {
     return false;
   }

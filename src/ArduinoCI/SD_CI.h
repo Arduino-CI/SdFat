@@ -59,6 +59,7 @@ public:
   bool truncate(uint32_t length);
   size_t write(const char *str);
   size_t write(const void *buf, size_t count);
+  operator bool();
 
 private:
   file_ci *file;
@@ -77,8 +78,8 @@ public:
   bool ls(uint8_t flags = 0);
   bool mkdir(const char *path, bool pFlag = true);
   bool mkdir(const String &path, bool pFlag = true);
-  // File_CI open(const char *path, oflag_t oflag = 0x00);
-  // File_CI open(const String &path, oflag_t oflag = 0x00);
+  File_CI open(const char *path, oflag_t oflag = 0x00);
+  File_CI open(const String &path, oflag_t oflag = 0x00);
   bool remove(const char *path);
   bool remove(const String &path);
   bool rmdir(const char *path);
@@ -88,7 +89,8 @@ private:
   String _cwd = String("/");
   bool _didBegin = false;
   std::set<String> dirs = {"/"};
-  String _normalizePath(String inPath);
+  String _normalizeDirPath(String inPath);
+  String _normalizeFilePath(String inPath);
 };
 
 #endif
