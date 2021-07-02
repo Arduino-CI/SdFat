@@ -1,5 +1,7 @@
 #include <Arduino.h>
 
+#ifdef MOCK_PINS_COUNT
+
 const uint8_t LS_A = 0x01;    // ls() flag for list all files including hidden.
 const uint8_t LS_DATE = 0x02; // ls() flag to print modify date.
 const uint8_t LS_SIZE = 0x04; // ls() flag to print file size.
@@ -63,5 +65,7 @@ public:
   // bool rmdir(const String &path);
 
 private:
-  bool didBegin = false;
+  bool _didBegin = false;
 };
+
+#endif

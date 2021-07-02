@@ -17,4 +17,4 @@ jobs:
       - name: Check style, functionality, and usage
         run: |
           g++ -v
-          scripts/testAndBuild.sh
+          scripts/test.sh

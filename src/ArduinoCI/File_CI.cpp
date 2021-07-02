@@ -1,5 +1,7 @@
 #include "SD_CI.h"
 
+#ifdef MOCK_PINS_COUNT
+
 File_CI::File_CI(String name, String contents) {
   this->_name = name;
   this->_contents = contents;
@@ -15,7 +17,7 @@ void File_CI::flush() {}
 
 size_t File_CI::getName(char *name, size_t size) {
   strncpy(name, _name.c_str(), size);
-  return min(size, _name.size());
+  return min(size, _name.length());
 }
 
 const char *File_CI::name() const { return _name.c_str(); }
@@ -49,7 +51,7 @@ bool File_CI::seekEnd(int32_t offset) {
   return true;
 }
 
-uint32_t File_CI::size() const { return _contents.size(); }
+uint32_t File_CI::size() const { return _contents.length(); }
 
 bool File_CI::truncate() {
   _contents.remove(_position);
@@ -70,3 +72,5 @@ size_t File_CI::write(const char *str) {
   _position += size;
   return size;
 }
+
+#endif
