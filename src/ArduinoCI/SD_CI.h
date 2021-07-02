@@ -21,9 +21,17 @@ const uint8_t LS_R = 0x08;    // ls() flag for recursive list of subdirectories.
 typedef uint8_t oflag_t;
 
 struct file_ci {
-  String contents;
+  file_ci(String name, const char *contents) {
+    this->name = name;
+    this->size = strlen(contents);
+    this->contents = static_cast<uint8_t *>(malloc(size));
+    this->position = 0;
+    memcpy(this->contents, contents, this->size);
+  }
+  uint8_t *contents;
   String name;
   uint32_t position = 0;
+  size_t size;
 };
 
 class File_CI {
@@ -44,6 +52,7 @@ public:
   bool truncate();
   bool truncate(uint32_t length);
   size_t write(const char *str);
+  size_t write(const void *buf, size_t count);
 
 private:
   file_ci *file;
