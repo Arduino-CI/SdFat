@@ -8,23 +8,49 @@ bundle exec arduino_ci.rb  --skip-unittests
 #include "ArduinoUnitTests.h"
 #include "SD.h"
 
+// This test indicates that the File_CI object really points
+// to the "persistent" data, not a copy of it.
+unittest(constructor) {
+  file_ci _file = {};
+  _file.name = String("Genesis");
+  _file.contents = String("In the beginning God");
+  File_CI file(&_file);
+  _file.contents.concat(" created");
+  char bytes[30];
+  size_t size = file.read(bytes, 30);
+  assertEqual(28, size);
+  assertEqual("In the beginning God created", bytes);
+}
+
 unittest(available32) {
-  File_CI file("Genesis", "In the beginning God");
+  file_ci _file = {};
+  _file.name = String("Genesis");
+  _file.contents = String("In the beginning God");
+  File_CI file(&_file);
   assertEqual(20, file.available32());
 }
 
 unittest(close) {
-  File_CI file("Genesis", "In the beginning God");
+  file_ci _file = {};
+  _file.name = String("Genesis");
+  _file.contents = String("In the beginning God");
+  File_CI file(&_file);
   assertTrue(file.close());
 }
 
 unittest(flush) {
-  File_CI file("Genesis", "In the beginning God");
+  file_ci _file = {};
+  _file.name = String("Genesis");
+  _file.contents = String("In the beginning God");
+  File_CI file(&_file);
   file.flush();
 }
 
 unittest(getName) {
-  File_CI file("Genesis", "In the beginning God");
+  file_ci _file = {};
+  _file.name = String("Genesis");
+  _file.contents = String("In the beginning God");
+  File_CI file(&_file);
   char name[20];
   size_t size = file.getName(name, sizeof(name));
   assertEqual(7, size);
@@ -32,12 +58,18 @@ unittest(getName) {
 }
 
 unittest(name) {
-  File_CI file("Genesis", "In the beginning God");
+  file_ci _file = {};
+  _file.name = String("Genesis");
+  _file.contents = String("In the beginning God");
+  File_CI file(&_file);
   assertEqual(String("Genesis"), file.name());
 }
 
 unittest(position_rewind_seek_seekEnd) {
-  File_CI file("Genesis", "In the beginning God");
+  file_ci _file = {};
+  _file.name = String("Genesis");
+  _file.contents = String("In the beginning God");
+  File_CI file(&_file);
   assertEqual(0, file.position());
   file.seek(10);
   assertEqual(10, file.position());
@@ -50,13 +82,19 @@ unittest(position_rewind_seek_seekEnd) {
 }
 
 unittest(readByte) {
-  File_CI file("Genesis", "In the beginning God");
+  file_ci _file = {};
+  _file.name = String("Genesis");
+  _file.contents = String("In the beginning God");
+  File_CI file(&_file);
   assertEqual((int)'I', file.read());
   assertEqual((int)'n', file.read());
 }
 
 unittest(readBytes) {
-  File_CI file("Genesis", "In the beginning God");
+  file_ci _file = {};
+  _file.name = String("Genesis");
+  _file.contents = String("In the beginning God");
+  File_CI file(&_file);
   char bytes[20];
   size_t size = file.read(bytes, 6);
   assertEqual(6, size);
@@ -64,12 +102,18 @@ unittest(readBytes) {
 }
 
 unittest(size) {
-  File_CI file("Genesis", "In the beginning God");
+  file_ci _file = {};
+  _file.name = String("Genesis");
+  _file.contents = String("In the beginning God");
+  File_CI file(&_file);
   assertEqual(20, file.size());
 }
 
 unittest(truncate_at_position) {
-  File_CI file("Genesis", "In the beginning God");
+  file_ci _file = {};
+  _file.name = String("Genesis");
+  _file.contents = String("In the beginning God");
+  File_CI file(&_file);
   assertEqual(20, file.size());
   assertEqual(0, file.position());
   file.seek(10);
@@ -80,7 +124,10 @@ unittest(truncate_at_position) {
 }
 
 unittest(truncate_at_value) {
-  File_CI file("Genesis", "In the beginning God");
+  file_ci _file = {};
+  _file.name = String("Genesis");
+  _file.contents = String("In the beginning God");
+  File_CI file(&_file);
   assertEqual(20, file.size());
   assertEqual(0, file.position());
   assertTrue(file.truncate(10));
@@ -89,7 +136,10 @@ unittest(truncate_at_value) {
 }
 
 unittest(write_string) {
-  File_CI file("Genesis", "In the beginning God");
+  file_ci _file = {};
+  _file.name = String("Genesis");
+  _file.contents = String("In the beginning God");
+  File_CI file(&_file);
   assertEqual(20, file.size());
   assertEqual(0, file.position());
   assertTrue(file.seekEnd());
