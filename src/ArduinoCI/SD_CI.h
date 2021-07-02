@@ -2,6 +2,8 @@
 
 #ifdef MOCK_PINS_COUNT
 
+#include <set>
+
 const uint8_t LS_A = 0x01;    // ls() flag for list all files including hidden.
 const uint8_t LS_DATE = 0x02; // ls() flag to print modify date.
 const uint8_t LS_SIZE = 0x04; // ls() flag to print file size.
@@ -21,7 +23,7 @@ const uint8_t LS_R = 0x08;    // ls() flag for recursive list of subdirectories.
 typedef uint8_t oflag_t;
 
 struct file_ci {
-  file_ci(String name, const char *contents) {
+  file_ci(String name, const char *contents = "") {
     this->name = name;
     this->size = strlen(contents);
     this->contents = static_cast<uint8_t *>(malloc(size));
@@ -64,25 +66,29 @@ private:
 
 class SdFat_CI {
 public:
+  String _getCwd();
   bool begin(uint8_t csPin);
-  // bool chdir();
-  // bool chdir(const char *path);
-  // bool chdir(const String &path);
-  // bool exists(const char *path);
-  // bool exists(const String &path);
+  bool chdir();
+  bool chdir(const char *path);
+  bool chdir(const String &path);
+  bool exists(const char *path);
+  bool exists(const String &path);
   bool format();
-  // bool ls(uint8_t flags = 0);
-  // bool mkdir(const char *path);
-  // bool mkdir(const String &path);
+  bool ls(uint8_t flags = 0);
+  bool mkdir(const char *path, bool pFlag = true);
+  bool mkdir(const String &path, bool pFlag = true);
   // File_CI open(const char *path, oflag_t oflag = 0x00);
   // File_CI open(const String &path, oflag_t oflag = 0x00);
-  // bool remove(const char *path);
-  // bool remove(const String &path);
-  // bool rmdir(const char *path);
-  // bool rmdir(const String &path);
+  bool remove(const char *path);
+  bool remove(const String &path);
+  bool rmdir(const char *path);
+  bool rmdir(const String &path);
 
 private:
+  String _cwd = String("/");
   bool _didBegin = false;
+  std::set<String> dirs = {"/"};
+  String _normalizePath(String inPath);
 };
 
 #endif
