@@ -28,6 +28,10 @@ struct file_ci {
     this->position = 0;
     memcpy(this->contents, contents, this->size);
   }
+  ~file_ci() {
+    free(this->contents);
+    this->contents = nullptr;
+  }
   uint8_t *contents;
   String name;
   uint32_t position = 0;

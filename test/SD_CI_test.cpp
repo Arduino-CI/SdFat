@@ -8,24 +8,14 @@ bundle exec arduino_ci.rb  --skip-unittests
 #include "ArduinoUnitTests.h"
 #include "SD.h"
 
-unittest_setup() {
-  SD sd;
-  sd.format();
-}
+SD sd;
 
-unittest_teardown() {
-  SD sd;
-  sd.format();
-}
+unittest_setup() { sd.format(); }
 
-unittest(begin) {
-  SD sd;
-  assertTrue(sd.begin(0));
-}
+unittest_teardown() { sd.format(); }
 
-unittest(format) {
-  SD sd;
-  assertTrue(sd.format());
-}
+unittest(begin) { assertTrue(sd.begin(0)); }
+
+unittest(format) { assertTrue(sd.format()); }
 
 unittest_main()

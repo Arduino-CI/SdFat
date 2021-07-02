@@ -8,24 +8,6 @@ bundle exec arduino_ci.rb  --skip-unittests
 #include "ArduinoUnitTests.h"
 #include "SD.h"
 
-// This test indicates that the File_CI object really points
-// to the "persistent" data, not a copy of it.
-// unittest(constructor) {
-//   file_ci _file(String("Genesis"), "In the beginning God");
-//   _file.contents.concat(" created");
-//   assertEqual(28, _file.contents.length());
-//   assertEqual(28, strlen(_file.contents.c_str()));
-//   char bytes[30];
-//   size_t size = file.read(bytes, sizeof(bytes) - 1);
-//   bytes[size] = 0;
-//   assertEqual(28, size);
-//   assertEqual(28, strnlen(bytes, sizeof(bytes)));
-//   assertEqual(0, (int)bytes[28]);
-//   int value = strncmp("In the beginning God created", bytes, sizeof(bytes));
-//   assertEqual(0, value);
-//   assertEqual("In the beginning God created", bytes);
-// }
-
 unittest(available32) {
   file_ci _file(String("Genesis"), "In the beginning God");
   File_CI file(&_file);
