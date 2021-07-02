@@ -12,13 +12,21 @@ bundle exec arduino_ci.rb  --skip-unittests
 // to the "persistent" data, not a copy of it.
 unittest(constructor) {
   file_ci _file = {};
+  File_CI file(&_file);
   _file.name = String("Genesis");
   _file.contents = String("In the beginning God");
-  File_CI file(&_file);
+  assertEqual(20, _file.contents.length());
   _file.contents.concat(" created");
+  assertEqual(28, _file.contents.length());
+  assertEqual(28, strlen(_file.contents.c_str()));
   char bytes[30];
-  size_t size = file.read(bytes, 30);
+  size_t size = file.read(bytes, sizeof(bytes) - 1);
+  bytes[size] = 0;
   assertEqual(28, size);
+  assertEqual(28, strnlen(bytes, sizeof(bytes)));
+  assertEqual(0, (int)bytes[28]);
+  int value = strncmp("In the beginning God created", bytes, sizeof(bytes));
+  assertEqual(0, value);
   assertEqual("In the beginning God created", bytes);
 }
 
@@ -97,6 +105,7 @@ unittest(readBytes) {
   File_CI file(&_file);
   char bytes[20];
   size_t size = file.read(bytes, 6);
+  bytes[6] = 0;
   assertEqual(6, size);
   assertEqual("In the", bytes);
 }

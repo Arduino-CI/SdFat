@@ -31,8 +31,8 @@ int File_CI::read() {
 
 int File_CI::read(void *buf, size_t count) {
   int size = min(count, this->available32());
-  strncpy(static_cast<char *>(buf), file->contents.c_str() + file->position,
-          size);
+  memcpy(static_cast<char *>(buf), file->contents.c_str() + file->position,
+         size);
   file->position += size;
   return size;
 }
