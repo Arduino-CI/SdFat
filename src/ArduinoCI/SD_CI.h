@@ -3,6 +3,7 @@
 #ifdef MOCK_PINS_COUNT
 
 #include <set>
+#include <vector>
 
 const uint8_t LS_A = 0x01;    // ls() flag for list all files including hidden.
 const uint8_t LS_DATE = 0x02; // ls() flag to print modify date.
@@ -92,6 +93,7 @@ private:
   String _cwd = String("/");
   bool _didBegin = false;
   std::set<String> dirs = {"/"};
+  std::vector<File_CI> files;
   String _normalizeDirPath(String inPath);
   String _normalizeFilePath(String inPath);
 };

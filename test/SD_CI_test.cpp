@@ -66,6 +66,12 @@ unittest(format) {
   assertFalse(sd.exists("/foo/bar"));
 }
 
+unittest(file_exists) {
+  assertFalse(sd.exists("foo.txt"));
+  file = sd.open("foo.txt", O_WRONLY | O_CREAT);
+  assertTrue(sd.exists("foo.txt"));
+}
+
 unittest(ls) { assertTrue(true); } // TODO
 
 /*

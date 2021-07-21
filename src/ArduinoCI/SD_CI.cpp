@@ -55,7 +55,11 @@ bool SdFat_CI::chdir(const String &path) {
   return false;
 }
 
-bool SdFat_CI::exists(const char *path) { return this->exists(String(path)); }
+bool SdFat_CI::exists(const char *path) {
+  if (this->exists(String(path))) {
+    return true;
+  };
+}
 
 bool SdFat_CI::exists(const String &path) {
   assert(_didBegin);
@@ -115,7 +119,7 @@ File_CI SdFat_CI::open(const String &path, oflag_t oflag) {
   File_CI file;
   if (this->exists(fullPath)) {
     if (oflag & O_EXCL) {
-      return File_CI(nullptr);
+      return file;
     }
   } else { // file does not exist
     if (oflag & O_CREAT) {
@@ -123,14 +127,15 @@ File_CI SdFat_CI::open(const String &path, oflag_t oflag) {
       file_ci *_file = new file_ci(fullPath);
       File_CI temp(_file);
       file = temp;
+      files.push_back(file);
     } else {
-      return File_CI(nullptr);
+      return file;
     }
   }
   // TODO: handle other open situations
 
   // otherwise, fail
-  return File_CI(nullptr);
+  return file;
 }
 
 bool SdFat_CI::remove(const char *path) { return this->remove(String(path)); }
