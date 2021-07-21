@@ -112,11 +112,25 @@ File_CI SdFat_CI::open(const char *path, oflag_t oflag) {
 */
 File_CI SdFat_CI::open(const String &path, oflag_t oflag) {
   String fullPath = _normalizeFilePath(path);
+  File_CI file;
   if (this->exists(fullPath)) {
     if (oflag & O_EXCL) {
       return File_CI(nullptr);
     }
+  } else { // file does not exist
+    if (oflag & O_CREAT) {
+      // create file
+      file_ci *_file = new file_ci(fullPath);
+      File_CI temp(_file);
+      file = temp;
+    } else {
+      return File_CI(nullptr);
+    }
   }
+  // TODO: handle other open situations
+
+  // otherwise, fail
+  return File_CI(nullptr);
 }
 
 bool SdFat_CI::remove(const char *path) { return this->remove(String(path)); }

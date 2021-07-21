@@ -22,6 +22,7 @@ const uint8_t LS_R = 0x08;    // ls() flag for recursive list of subdirectories.
 #define O_ACCMODE (O_RDONLY | O_WRONLY | O_RDWR) ///< Mask for access mode.
 typedef uint8_t oflag_t;
 
+// internal "mock" file
 struct file_ci {
   file_ci(String name, const char *contents = "") {
     this->name = name;
@@ -40,8 +41,10 @@ struct file_ci {
   size_t size;
 };
 
+// public wrapper for a file with API matching File[32]
 class File_CI {
 public:
+  File_CI();
   File_CI(file_ci *file);
   uint32_t available32() const;
   bool close();
@@ -62,7 +65,7 @@ public:
   operator bool();
 
 private:
-  file_ci *file;
+  file_ci *file = nullptr;
 };
 
 class SdFat_CI {

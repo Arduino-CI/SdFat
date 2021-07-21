@@ -4,6 +4,8 @@
 
 #include <cassert>
 
+File_CI::File_CI() {}
+
 File_CI::File_CI(file_ci *file) { this->file = file; }
 
 uint32_t File_CI::available32() const {
