@@ -55,21 +55,27 @@ bool SdFat_CI::chdir(const String &path) {
   return false;
 }
 
-bool SdFat_CI::exists(const char *path) {
-  if (this->exists(String(path))) {
-    return true;
-  };
-}
+bool SdFat_CI::exists(const char *path) { return this->exists(String(path)); }
 
 bool SdFat_CI::exists(const String &path) {
   assert(_didBegin);
-  return dirs.count(this->_normalizeDirPath(path)) == 1;
+  if (dirs.count(this->_normalizeDirPath(path)) == 1) {
+    return true;
+  }
+  String fullPath = this->_normalizeFilePath(path);
+  for (auto file : files) {
+    if (strncmp(fullPath.c_str(), file.name(), fullPath.length()) == 0) {
+      return true;
+    }
+  }
+  return false;
 }
 
 bool SdFat_CI::format() {
   assert(_didBegin);
   dirs.clear();
   dirs.emplace("/");
+  files.clear();
   return this->chdir();
 }
 
@@ -116,25 +122,25 @@ File_CI SdFat_CI::open(const char *path, oflag_t oflag) {
 */
 File_CI SdFat_CI::open(const String &path, oflag_t oflag) {
   String fullPath = _normalizeFilePath(path);
-  File_CI file;
   if (this->exists(fullPath)) {
     if (oflag & O_EXCL) {
-      return file;
+      return File_CI(); // empty file reference to signal an error
     }
-  } else { // file does not exist
-    if (oflag & O_CREAT) {
-      // create file
+  } else {                 // file does not exist
+    if (oflag & O_CREAT) { // create file
       file_ci *_file = new file_ci(fullPath);
       File_CI temp(_file);
-      file = temp;
-      files.push_back(file);
+      files.push_back(temp);
+      temp.close();
     } else {
-      return file;
+      return File_CI(); // empty file reference to signal an error
     }
   }
-  // TODO: handle other open situations
+  // open existing file with proper mode
+  file_ci *_file = new file_ci(fullPath, oflag);
+  File_CI file(_file);
+  files.push_back(file);
 
-  // otherwise, fail
   return file;
 }
 

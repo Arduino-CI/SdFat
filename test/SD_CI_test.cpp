@@ -84,14 +84,38 @@ unittest(ls) { assertTrue(true); } // TODO
 #define O_TRUNC 0x20  ///< Truncate file to zero length.
 #define O_EXCL 0x40   ///< Fail if the file exists.
 */
-unittest(open_readonly_fails_if_file_does_not_exist) {
+unittest(open_fails) {
+  assertFalse(sd.exists("foo.txt"));
   file = sd.open("foo.txt");
   assertFalse(file);
 }
 
-unittest(open_write_create) {
-  file = sd.open("foo.txt", O_WRONLY | O_CREAT);
+unittest(open_create) {
+  assertFalse(sd.exists("foo.txt"));
+  file = sd.open("foo.txt", O_CREAT);
   assertTrue(file);
+  assertTrue(sd.exists("foo.txt"));
+}
+
+unittest(open_read_only) {
+  file_ci _file(O_RDONLY);
+  File_CI file(&_file);
+  assertEqual((int)'I', file.read());
+  assertEqual(-1, file.write("X"));
+}
+
+unittest(open_write_only) {
+  file_ci _file(O_WRONLY);
+  File_CI file(&_file);
+  assertEqual(-1, file.read());
+  assertEqual(1, file.write("X"));
+}
+
+unittest(open_read_write) {
+  file_ci _file(O_RDWR);
+  File_CI file(&_file);
+  assertEqual((int)'I', file.read());
+  assertEqual(1, file.write("X"));
 }
 
 unittest(remove) { assertTrue(true); } // TODO

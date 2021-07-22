@@ -39,6 +39,9 @@ uint32_t File_CI::position() const {
 
 int File_CI::read() {
   assert(file != nullptr);
+  if (file->oflag == O_WRONLY) {
+    return -1;
+  }
   if (this->available32()) {
     uint8_t *ptr = static_cast<uint8_t *>(file->contents + file->position);
     int value = *ptr;
@@ -51,6 +54,9 @@ int File_CI::read() {
 
 int File_CI::read(void *buf, size_t count) {
   assert(file != nullptr);
+  if (file->oflag == O_WRONLY) {
+    return -1;
+  }
   int size = min(count, this->available32());
   memcpy(buf, file->contents + file->position, size);
   file->position += size;
@@ -99,11 +105,18 @@ bool File_CI::truncate(uint32_t length) {
 }
 
 size_t File_CI::write(const char *str) {
+  assert(file != nullptr);
+  if (file->oflag == O_RDONLY) {
+    return -1;
+  }
   return this->write(static_cast<const void *>(str), strlen(str));
 }
 
 size_t File_CI::write(const void *buf, size_t count) {
   assert(file != nullptr);
+  if (file->oflag == O_RDONLY) {
+    return -1;
+  }
   if (count <= this->available32()) {
     memcpy(file->contents + file->position, buf, count);
   } else {

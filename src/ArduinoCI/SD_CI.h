@@ -25,19 +25,26 @@ typedef uint8_t oflag_t;
 
 // internal "mock" file
 struct file_ci {
-  file_ci(String name, const char *contents = "") {
+  file_ci(oflag_t oflag = 0x02, bool append = false)
+      : file_ci(String("Genesis"), oflag, append, "In the beginning God") {}
+  file_ci(String name, oflag_t oflag = 0x00, bool append = false,
+          const char *contents = "") {
     this->name = name;
     this->size = strlen(contents);
     this->contents = static_cast<uint8_t *>(malloc(size));
     this->position = 0;
+    this->oflag = oflag;
+    this->append = append;
     memcpy(this->contents, contents, this->size);
   }
   ~file_ci() {
     free(this->contents);
     this->contents = nullptr;
   }
+  bool append = false;
   uint8_t *contents;
   String name;
+  oflag_t oflag;
   uint32_t position = 0;
   size_t size;
 };
