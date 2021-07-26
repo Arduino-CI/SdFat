@@ -1,3 +1,10 @@
+Gemfile.lock
+.bundle
+vendor
+*.cpp.bin*
+.vscode
+libarduino.so*
+
 #################
 ## Eclipse
 #################
@@ -213,3 +220,4 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+doc/html

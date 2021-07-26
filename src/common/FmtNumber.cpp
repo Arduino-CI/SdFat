@@ -29,7 +29,9 @@
 // Use Stimmer div/mod 10 on avr
 #ifdef __AVR__
 #include <avr/pgmspace.h>
+#ifndef __x86_64__
 #define USE_STIMMER
+#endif  // __x86_64__
 #endif  // __AVR__
 //------------------------------------------------------------------------------
 // Stimmer div/mod 10 for AVR
