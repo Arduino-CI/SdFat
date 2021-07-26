@@ -72,6 +72,9 @@ bool SdFat_CI::format() {
   assert(_didBegin);
   dirs.clear();
   dirs.emplace("/");
+  for (auto const &each : files) {
+    delete each.second;
+  }
   files.clear();
   return this->chdir();
 }
