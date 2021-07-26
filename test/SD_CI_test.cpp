@@ -11,6 +11,12 @@ bundle exec arduino_ci.rb  --skip-unittests
 SD sd;
 File file;
 
+void createFoo() {
+  file = sd.open("foo.txt", O_CREAT | O_WRONLY);
+  file.write("bar");
+  file.close();
+}
+
 unittest_setup() {
   sd.begin(0);
   sd.format();
@@ -68,7 +74,7 @@ unittest(format) {
 
 unittest(file_exists) {
   assertFalse(sd.exists("foo.txt"));
-  file = sd.open("foo.txt", O_WRONLY | O_CREAT);
+  createFoo();
   assertTrue(sd.exists("foo.txt"));
 }
 
@@ -98,28 +104,51 @@ unittest(open_create) {
 }
 
 unittest(open_read_only) {
-  file_ci _file(O_RDONLY);
-  File_CI file(&_file);
-  assertEqual((int)'I', file.read());
+  createFoo();
+  assertTrue(sd.exists("foo.txt"));
+  file = sd.open("foo.txt", O_RDONLY);
+  assertTrue(file);
+  assertEqual(3, file.size());
+  assertEqual(0, file.position());
+  assertEqual((int)'b', file.read());
   assertEqual(-1, file.write("X"));
 }
 
 unittest(open_write_only) {
-  file_ci _file(O_WRONLY);
-  File_CI file(&_file);
+  file = sd.open("foo.txt", O_CREAT | O_WRONLY);
   assertEqual(-1, file.read());
   assertEqual(1, file.write("X"));
 }
 
 unittest(open_read_write) {
-  file_ci _file(O_RDWR);
-  File_CI file(&_file);
-  assertEqual((int)'I', file.read());
+  createFoo();
+  file = sd.open("foo.txt", O_RDWR);
+  assertEqual((int)'b', file.read());
   assertEqual(1, file.write("X"));
 }
 
-unittest(remove) { assertTrue(true); } // TODO
+unittest(open_truncate) {
+  createFoo();
+  file = sd.open("foo.txt", O_RDWR | O_TRUNC);
+  assertEqual(0, file.size());
+  assertEqual(0, file.position());
+}
 
-unittest(rename) { assertTrue(true); } // TODO
+unittest(remove) {
+  createFoo();
+  assertTrue(sd.exists("foo.txt"));
+  assertTrue(sd.remove("foo.txt"));
+  assertFalse(sd.exists("foo.txt"));
+  assertFalse(sd.remove("foo.txt"));
+}
+
+unittest(rename) {
+  createFoo();
+  assertTrue(sd.exists("foo.txt"));
+  assertFalse(sd.exists("bar.txt"));
+  assertTrue(sd.rename("foo.txt", "bar.txt"));
+  assertFalse(sd.exists("foo.txt"));
+  assertTrue(sd.exists("bar.txt"));
+}
 
 unittest_main()

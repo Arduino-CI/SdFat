@@ -62,11 +62,8 @@ bool SdFat_CI::exists(const String &path) {
   if (dirs.count(this->_normalizeDirPath(path)) == 1) {
     return true;
   }
-  String fullPath = this->_normalizeFilePath(path);
-  for (auto file : files) {
-    if (strncmp(fullPath.c_str(), file.name(), fullPath.length()) == 0) {
-      return true;
-    }
+  if (files.count(this->_normalizeFilePath(path)) == 1) {
+    return true;
   }
   return false;
 }
@@ -122,31 +119,53 @@ File_CI SdFat_CI::open(const char *path, oflag_t oflag) {
 */
 File_CI SdFat_CI::open(const String &path, oflag_t oflag) {
   String fullPath = _normalizeFilePath(path);
+  file_ci *file = nullptr;
   if (this->exists(fullPath)) {
     if (oflag & O_EXCL) {
       return File_CI(); // empty file reference to signal an error
     }
+    file = files.at(fullPath);
   } else {                 // file does not exist
     if (oflag & O_CREAT) { // create file
-      file_ci *_file = new file_ci(fullPath);
-      File_CI temp(_file);
-      files.push_back(temp);
-      temp.close();
+      file = new file_ci(path);
+      files.emplace(fullPath, file);
     } else {
       return File_CI(); // empty file reference to signal an error
     }
   }
   // open existing file with proper mode
-  file_ci *_file = new file_ci(fullPath, oflag);
-  File_CI file(_file);
-  files.push_back(file);
-
-  return file;
+  return File_CI(file, oflag);
 }
 
 bool SdFat_CI::remove(const char *path) { return this->remove(String(path)); }
 
-bool SdFat_CI::remove(const String &path) { return false; }
+bool SdFat_CI::remove(const String &path) {
+  if (this->exists(path)) {
+    String fullPath = _normalizeFilePath(path);
+    file_ci *file = files.at(fullPath);
+    files.erase(fullPath);
+    delete file;
+    return true;
+  }
+  return false;
+}
+
+bool SdFat_CI::rename(const char *oldPath, const char *newPath) {
+  return this->rename(String(oldPath), String(newPath));
+}
+
+bool SdFat_CI::rename(const String &oldPath, const String &newPath) {
+  String fullOldPath = _normalizeFilePath(oldPath);
+  String fullNewPath = _normalizeFilePath(newPath);
+  if (!this->exists(fullOldPath) || this->exists(fullNewPath)) {
+    return false;
+  }
+  file_ci *file = this->files.at(fullOldPath);
+  file->name = fullNewPath;
+  this->files.erase(fullOldPath);
+  this->files.emplace(fullNewPath, file);
+  return true;
+}
 
 bool SdFat_CI::rmdir(const char *path) { return this->rmdir(String(path)); }
 

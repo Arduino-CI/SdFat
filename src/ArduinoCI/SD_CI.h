@@ -2,8 +2,8 @@
 
 #ifdef MOCK_PINS_COUNT
 
+#include <map>
 #include <set>
-#include <vector>
 
 const uint8_t LS_A = 0x01;    // ls() flag for list all files including hidden.
 const uint8_t LS_DATE = 0x02; // ls() flag to print modify date.
@@ -23,37 +23,20 @@ const uint8_t LS_R = 0x08;    // ls() flag for recursive list of subdirectories.
 #define O_ACCMODE (O_RDONLY | O_WRONLY | O_RDWR) ///< Mask for access mode.
 typedef uint8_t oflag_t;
 
-// internal "mock" file
-struct file_ci {
-  file_ci(oflag_t oflag = 0x02, bool append = false)
-      : file_ci(String("Genesis"), oflag, append, "In the beginning God") {}
-  file_ci(String name, oflag_t oflag = 0x00, bool append = false,
-          const char *contents = "") {
-    this->name = name;
-    this->size = strlen(contents);
-    this->contents = static_cast<uint8_t *>(malloc(size));
-    this->position = 0;
-    this->oflag = oflag;
-    this->append = append;
-    memcpy(this->contents, contents, this->size);
-  }
-  ~file_ci() {
-    free(this->contents);
-    this->contents = nullptr;
-  }
-  bool append = false;
-  uint8_t *contents;
+// private file
+class file_ci {
+public:
+  file_ci(String name);
+  ~file_ci();
+  uint8_t *contents = nullptr;
   String name;
-  oflag_t oflag;
-  uint32_t position = 0;
-  size_t size;
+  uint32_t size = 0;
 };
 
 // public wrapper for a file with API matching File[32]
 class File_CI {
 public:
-  File_CI();
-  File_CI(file_ci *file);
+  File_CI(file_ci *file = nullptr, oflag_t oflag = 0x00);
   uint32_t available32() const;
   bool close();
   void flush();
@@ -73,7 +56,9 @@ public:
   operator bool();
 
 private:
-  file_ci *file = nullptr;
+  file_ci *file;
+  oflag_t oflag = 0x00;
+  uint32_t _position = 0;
 };
 
 class SdFat_CI {
@@ -95,12 +80,14 @@ public:
   bool remove(const String &path);
   bool rmdir(const char *path);
   bool rmdir(const String &path);
+  bool rename(const char *oldPath, const char *newPath);
+  bool rename(const String &oldPath, const String &newPath);
 
 private:
   String _cwd = String("/");
   bool _didBegin = false;
   std::set<String> dirs = {"/"};
-  std::vector<File_CI> files;
+  std::map<String, file_ci *> files;
   String _normalizeDirPath(String inPath);
   String _normalizeFilePath(String inPath);
 };
