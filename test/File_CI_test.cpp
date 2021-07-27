@@ -24,6 +24,22 @@ unittest_teardown() {
   sd.format();
 }
 
+unittest(append) {
+  file.close();
+  file = sd.open("Genesis", O_APPEND | O_WRONLY);
+  file.write(" created the heavens");
+  file.rewind();
+  file.write(" and the earth.");
+  file.close();
+  file = sd.open("Genesis", O_RDONLY);
+  assertEqual(55, file.size());
+  char bytes[60];
+  size_t size = file.read(bytes, 60);
+  assertEqual(55, size);
+  bytes[55] = 0;
+  assertEqual("In the beginning God created the heavens and the earth.", bytes);
+}
+
 unittest(available32) {
   assertEqual(0, file.position());
   assertEqual(20, file.size());
