@@ -14,7 +14,7 @@ File file;
 unittest_setup() {
   sd.begin(0);
   sd.format();
-  file = sd.open("Genesis", O_CREAT | O_WRONLY);
+  file = sd.open("Genesis", O_CREAT | O_RDWR);
   file.write("In the beginning God");
   file.rewind();
 }
@@ -83,7 +83,7 @@ unittest(readByte) {
 
 unittest(readBytes) {
   char bytes[20];
-  size_t size = file.read(bytes, 6);
+  int size = file.read(bytes, 6);
   bytes[6] = 0;
   assertEqual(6, size);
   assertEqual("In the", bytes);
