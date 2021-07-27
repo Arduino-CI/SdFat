@@ -14,7 +14,7 @@ File file;
 unittest_setup() {
   sd.begin(0);
   sd.format();
-  file = sd.open("Genesis", O_CREAT | O_WRONLY);
+  file = sd.open("Genesis", O_CREAT | O_RDWR);
   file.write("In the beginning God");
   file.rewind();
 }
@@ -22,6 +22,22 @@ unittest_setup() {
 unittest_teardown() {
   file.close();
   sd.format();
+}
+
+unittest(append) {
+  file.close();
+  file = sd.open("Genesis", O_APPEND | O_WRONLY);
+  file.write(" created the heavens");
+  file.rewind();
+  file.write(" and the earth.");
+  file.close();
+  file = sd.open("Genesis", O_RDONLY);
+  assertEqual(55, file.size());
+  char bytes[60];
+  size_t size = file.read(bytes, 60);
+  assertEqual(55, size);
+  bytes[55] = 0;
+  assertEqual("In the beginning God created the heavens and the earth.", bytes);
 }
 
 unittest(available32) {
@@ -67,7 +83,7 @@ unittest(readByte) {
 
 unittest(readBytes) {
   char bytes[20];
-  size_t size = file.read(bytes, 6);
+  int size = file.read(bytes, 6);
   bytes[6] = 0;
   assertEqual(6, size);
   assertEqual("In the", bytes);

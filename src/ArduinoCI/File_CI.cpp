@@ -81,7 +81,7 @@ int File_CI::read() {
 
 int File_CI::read(void *buf, size_t count) {
   assert(this->file != nullptr);
-  if (this->oflag == O_WRONLY) {
+  if ((this->oflag & O_ACCMODE) == O_WRONLY) {
     return -1;
   }
   int size = min(count, this->available32());
@@ -132,17 +132,16 @@ bool File_CI::truncate(uint32_t length) {
 }
 
 size_t File_CI::write(const char *str) {
-  assert(this->file != nullptr);
-  if (this->oflag == O_RDONLY) {
-    return -1;
-  }
   return this->write(static_cast<const void *>(str), strlen(str));
 }
 
 size_t File_CI::write(const void *buf, size_t count) {
   assert(this->file != nullptr);
-  if (this->oflag == O_RDONLY) {
+  if ((this->oflag & O_ACCMODE) == O_RDONLY) {
     return -1;
+  }
+  if (this->oflag & O_APPEND) {
+    this->seekEnd();
   }
   if (this->available32() < count) {
     uint8_t *ptr = static_cast<uint8_t *>(malloc(this->_position + count));
