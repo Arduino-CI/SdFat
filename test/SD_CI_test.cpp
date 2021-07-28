@@ -6,7 +6,7 @@ bundle exec arduino_ci.rb  --skip-unittests
  */
 #include "Arduino.h"
 #include "ArduinoUnitTests.h"
-#include "SD.h"
+#include "SdFat.h"
 
 SD sd;
 File file;
