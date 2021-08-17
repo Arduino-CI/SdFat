@@ -24,18 +24,27 @@
  */
 #ifndef SdFat_h
 #define SdFat_h
+
+#include <Arduino.h>
+
+#ifdef MOCK_PINS_COUNT
+#include "ArduinoCI/SD_CI.h"
+#define SdFat SdFat_CI
+#define File File_CI
+#else // MOCK_PINS_COUNT
+
 /**
  * \file
  * \brief main SdFs include file.
  */
-#include "common/SysCall.h"
-#include "SdCard/SdCard.h"
 #include "ExFatLib/ExFatLib.h"
 #include "FatLib/FatLib.h"
 #include "FsLib/FsLib.h"
+#include "SdCard/SdCard.h"
+#include "common/SysCall.h"
 #if INCLUDE_SDIOS
 #include "sdios.h"
-#endif  // INCLUDE_SDIOS
+#endif // INCLUDE_SDIOS
 //------------------------------------------------------------------------------
 /** SdFat version  for cpp use. */
 #define SD_FAT_VERSION 20007
@@ -46,9 +55,8 @@
  * \class SdBase
  * \brief base SD file system template class.
  */
-template <class Vol>
-class SdBase : public Vol {
- public:
+template <class Vol> class SdBase : public Vol {
+public:
   //----------------------------------------------------------------------------
   /** Initialize SD card and file system.
    *
@@ -60,7 +68,7 @@ class SdBase : public Vol {
     if (csPin == BUILTIN_SDCARD) {
       return begin(SdioConfig(FIFO_SDIO));
     }
-#endif  // BUILTIN_SDCARD
+#endif // BUILTIN_SDCARD
     return begin(SdSpiConfig(csPin, SHARED_SPI));
   }
   //----------------------------------------------------------------------------
@@ -93,7 +101,7 @@ class SdBase : public Vol {
   }
   //----------------------------------------------------------------------------
   /** \return Pointer to SD card object. */
-  SdCard* card() {return m_card;}
+  SdCard *card() { return m_card; }
   //----------------------------------------------------------------------------
   /** Initialize SD card in SPI mode.
    *
@@ -119,7 +127,7 @@ class SdBase : public Vol {
    *
    * \param[in] pr Print destination.
    */
-  void errorHalt(print_t* pr) {
+  void errorHalt(print_t *pr) {
     if (sdErrorCode()) {
       pr->print(F("SdError: 0X"));
       pr->print(sdErrorCode(), HEX);
@@ -136,7 +144,7 @@ class SdBase : public Vol {
    * \param[in] pr Print destination.
    * \param[in] msg Message to print.
    */
-  void errorHalt(print_t* pr, const char* msg) {
+  void errorHalt(print_t *pr, const char *msg) {
     pr->print(F("error: "));
     pr->println(msg);
     errorHalt(pr);
@@ -147,7 +155,7 @@ class SdBase : public Vol {
    * \param[in] pr Print destination.
    * \param[in] msg Message to print.
    */
-  void errorHalt(print_t* pr, const __FlashStringHelper* msg) {
+  void errorHalt(print_t *pr, const __FlashStringHelper *msg) {
     pr->print(F("error: "));
     pr->println(msg);
     errorHalt(pr);
@@ -157,7 +165,7 @@ class SdBase : public Vol {
    *
    * \param[in] pr Print destination.
    */
-  void initErrorHalt(print_t* pr) {
+  void initErrorHalt(print_t *pr) {
     initErrorPrint(pr);
     SysCall::halt();
   }
@@ -167,7 +175,7 @@ class SdBase : public Vol {
    * \param[in] pr Print destination.
    * \param[in] msg Message to print.
    */
-  void initErrorHalt(print_t* pr, const char* msg) {
+  void initErrorHalt(print_t *pr, const char *msg) {
     pr->println(msg);
     initErrorHalt(pr);
   }
@@ -177,7 +185,7 @@ class SdBase : public Vol {
    * \param[in] pr Print destination.
    * \param[in] msg Message to print.
    */
-  void initErrorHalt(Print* pr, const __FlashStringHelper* msg) {
+  void initErrorHalt(Print *pr, const __FlashStringHelper *msg) {
     pr->println(msg);
     initErrorHalt(pr);
   }
@@ -186,7 +194,7 @@ class SdBase : public Vol {
    *
    * \param[in] pr Print destination.
    */
-  void initErrorPrint(Print* pr) {
+  void initErrorPrint(Print *pr) {
     pr->println(F("begin() failed"));
     if (sdErrorCode()) {
       pr->println(F("Do not reformat the SD."));
@@ -201,7 +209,7 @@ class SdBase : public Vol {
    *
    * \param[in] pr Print destination.
    */
-  void printFatType(print_t* pr) {
+  void printFatType(print_t *pr) {
     if (Vol::fatType() == FAT_TYPE_EXFAT) {
       pr->print(F("exFAT"));
     } else {
@@ -214,7 +222,7 @@ class SdBase : public Vol {
    *
    * \param[in] pr Print destination.
    */
-  void errorPrint(print_t* pr) {
+  void errorPrint(print_t *pr) {
     if (sdErrorCode()) {
       pr->print(F("SdError: 0X"));
       pr->print(sdErrorCode(), HEX);
@@ -230,7 +238,7 @@ class SdBase : public Vol {
    * \param[in] pr Print destination.
    * \param[in] msg Message to print.
    */
-  void errorPrint(print_t* pr, char const* msg) {
+  void errorPrint(print_t *pr, char const *msg) {
     pr->print(F("error: "));
     pr->println(msg);
     errorPrint(pr);
@@ -241,7 +249,7 @@ class SdBase : public Vol {
    * \param[in] pr Print destination.
    * \param[in] msg Message to print.
    */
-  void errorPrint(Print* pr, const __FlashStringHelper* msg) {
+  void errorPrint(Print *pr, const __FlashStringHelper *msg) {
     pr->print(F("error: "));
     pr->println(msg);
     errorPrint(pr);
@@ -251,7 +259,7 @@ class SdBase : public Vol {
    *
    * \param[in] pr Print destination.
    */
-  void printSdError(print_t* pr) {
+  void printSdError(print_t *pr) {
     if (sdErrorCode()) {
       if (sdErrorCode() == SD_CARD_ERROR_CMD0) {
         pr->println(F("No card, wrong chip select pin, or wiring error?"));
@@ -276,72 +284,66 @@ class SdBase : public Vol {
   }
   //----------------------------------------------------------------------------
   /** \return SD card error data. */
-  uint8_t sdErrorData() {return m_card ? m_card->errorData() : 0;}
+  uint8_t sdErrorData() { return m_card ? m_card->errorData() : 0; }
   //----------------------------------------------------------------------------
   /** \return pointer to base volume */
-  Vol* vol() {return reinterpret_cast<Vol*>(this);}
+  Vol *vol() { return reinterpret_cast<Vol *>(this); }
   //----------------------------------------------------------------------------
   /** Initialize file system after call to cardBegin.
    *
    * \return true for success or false for failure.
    */
-  bool volumeBegin() {
-     return Vol::begin(m_card);
-  }
+  bool volumeBegin() { return Vol::begin(m_card); }
 #if ENABLE_ARDUINO_SERIAL
   /** Print error details after begin() fails. */
-  void initErrorPrint() {
-    initErrorPrint(&Serial);
-  }
+  void initErrorPrint() { initErrorPrint(&Serial); }
   //----------------------------------------------------------------------------
   /** %Print msg to Serial and halt.
    *
    * \param[in] msg Message to print.
    */
-  void errorHalt(const __FlashStringHelper* msg) {
-    errorHalt(&Serial, msg);
-  }
+  void errorHalt(const __FlashStringHelper *msg) { errorHalt(&Serial, msg); }
   //----------------------------------------------------------------------------
   /** %Print error info to Serial and halt. */
-  void errorHalt() {errorHalt(&Serial);}
+  void errorHalt() { errorHalt(&Serial); }
   //----------------------------------------------------------------------------
   /** %Print error info and halt.
    *
    * \param[in] msg Message to print.
    */
-  void errorHalt(const char* msg) {errorHalt(&Serial, msg);}
+  void errorHalt(const char *msg) { errorHalt(&Serial, msg); }
   //----------------------------------------------------------------------------
   /** %Print error info and halt. */
-  void initErrorHalt() {initErrorHalt(&Serial);}
+  void initErrorHalt() { initErrorHalt(&Serial); }
   //----------------------------------------------------------------------------
   /** %Print msg, any SD error code.
    *
    * \param[in] msg Message to print.
    */
-  void errorPrint(const char* msg) {errorPrint(&Serial, msg);}
-   /** %Print msg, any SD error code.
+  void errorPrint(const char *msg) { errorPrint(&Serial, msg); }
+  /** %Print msg, any SD error code.
    *
    * \param[in] msg Message to print.
    */
-  void errorPrint(const __FlashStringHelper* msg) {errorPrint(&Serial, msg);}
+  void errorPrint(const __FlashStringHelper *msg) { errorPrint(&Serial, msg); }
   //----------------------------------------------------------------------------
   /** %Print error info and halt.
    *
    * \param[in] msg Message to print.
    */
-  void initErrorHalt(const char* msg) {initErrorHalt(&Serial, msg);}
+  void initErrorHalt(const char *msg) { initErrorHalt(&Serial, msg); }
   //----------------------------------------------------------------------------
   /** %Print error info and halt.
    *
    * \param[in] msg Message to print.
    */
-  void initErrorHalt(const __FlashStringHelper* msg) {
+  void initErrorHalt(const __FlashStringHelper *msg) {
     initErrorHalt(&Serial, msg);
   }
-#endif  // ENABLE_ARDUINO_SERIAL
+#endif // ENABLE_ARDUINO_SERIAL
   //----------------------------------------------------------------------------
- private:
-  SdCard* m_card;
+private:
+  SdCard *m_card;
   SdCardFactory m_cardFactory;
 };
 //------------------------------------------------------------------------------
@@ -350,15 +352,15 @@ class SdBase : public Vol {
  * \brief SD file system class for FAT volumes.
  */
 class SdFat32 : public SdBase<FatVolume> {
- public:
+public:
   /** Format a SD card FAT32/FAT16.
    *
    * \param[in] pr Optional Print information.
    * \return true for success or false for failure.
    */
-  bool format(print_t* pr = nullptr) {
+  bool format(print_t *pr = nullptr) {
     FatFormatter fmt;
-    uint8_t* cache = cacheClear();
+    uint8_t *cache = cacheClear();
     if (!cache) {
       return false;
     }
@@ -371,15 +373,15 @@ class SdFat32 : public SdBase<FatVolume> {
  * \brief SD file system class for exFAT volumes.
  */
 class SdExFat : public SdBase<ExFatVolume> {
- public:
+public:
   /** Format a SD card exFAT.
    *
    * \param[in] pr Optional Print information.
    * \return true for success or false for failure.
    */
-  bool format(print_t* pr = nullptr) {
+  bool format(print_t *pr = nullptr) {
     ExFatFormatter fmt;
-    uint8_t* cache = cacheClear();
+    uint8_t *cache = cacheClear();
     if (!cache) {
       return false;
     }
@@ -392,13 +394,13 @@ class SdExFat : public SdBase<ExFatVolume> {
  * \brief SD file system class for FAT16, FAT32, and exFAT volumes.
  */
 class SdFs : public SdBase<FsVolume> {
- public:
+public:
   /** Format a SD card FAT or exFAT.
    *
    * \param[in] pr Optional Print information.
    * \return true for success or false for failure.
    */
-  bool format(print_t* pr = nullptr) {
+  bool format(print_t *pr = nullptr) {
     static_assert(sizeof(m_volMem) >= 512, "m_volMem too small");
     uint32_t sectorCount = card()->sectorCount();
     if (sectorCount == 0) {
@@ -407,10 +409,10 @@ class SdFs : public SdBase<FsVolume> {
     end();
     if (sectorCount > 67108864) {
       ExFatFormatter fmt;
-      return fmt.format(card(), reinterpret_cast<uint8_t*>(m_volMem), pr);
+      return fmt.format(card(), reinterpret_cast<uint8_t *>(m_volMem), pr);
     } else {
       FatFormatter fmt;
-      return fmt.format(card(), reinterpret_cast<uint8_t*>(m_volMem), pr);
+      return fmt.format(card(), reinterpret_cast<uint8_t *>(m_volMem), pr);
     }
   }
 };
@@ -436,23 +438,21 @@ typedef SdFs SdFat;
 typedef FsFile File;
 #endif
 typedef FsBaseFile SdBaseFile;
-#else  // SDFAT_FILE_TYPE
+#else // SDFAT_FILE_TYPE
 #error Invalid SDFAT_FILE_TYPE
-#endif  // SDFAT_FILE_TYPE
+#endif // SDFAT_FILE_TYPE
 /**
  * \class SdFile
  * \brief FAT16/FAT32 file with Print.
  */
 class SdFile : public PrintFile<SdBaseFile> {
- public:
+public:
   SdFile() {}
   /** Create an open SdFile.
    * \param[in] path path for file.
    * \param[in] oflag open flags.
    */
-  SdFile(const char* path, oflag_t oflag) {
-    open(path, oflag);
-  }
+  SdFile(const char *path, oflag_t oflag) { open(path, oflag); }
   /** Set the date/time callback function
    *
    * \param[in] dateTime The user's call back function.  The callback
@@ -479,13 +479,15 @@ class SdFile : public PrintFile<SdBaseFile> {
    * sync() maintains the last access date and last modify date/time.
    *
    */
-  static void dateTimeCallback(
-    void (*dateTime)(uint16_t* date, uint16_t* time)) {
+  static void dateTimeCallback(void (*dateTime)(uint16_t *date,
+                                                uint16_t *time)) {
     FsDateTime::setCallback(dateTime);
   }
   /**  Cancel the date/time callback function. */
-  static void dateTimeCallbackCancel() {
-    FsDateTime::clearCallback();
-  }
+  static void dateTimeCallbackCancel() { FsDateTime::clearCallback(); }
 };
-#endif  // SdFat_h
+
+#define SD SdFat
+#endif // MOCK_PINS_COUNT
+
+#endif // SdFat_h
