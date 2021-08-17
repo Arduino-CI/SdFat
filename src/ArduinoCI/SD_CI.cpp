@@ -33,7 +33,7 @@ String SdFat_CI::_normalizeFilePath(String inPath) {
 String SdFat_CI::_getCwd() { return _cwd; }
 
 bool SdFat_CI::begin(uint8_t csPin) {
-  _didBegin = true;
+  std::cout << "SdFat_CI::begin()" << std::endl;
   return true;
 }
 
