@@ -8,7 +8,7 @@ bundle exec arduino_ci.rb  --skip-unittests
 #include "ArduinoUnitTests.h"
 #include "SdFat.h"
 
-SD sd;
+SdFat sd;
 File file;
 
 void createFoo() {

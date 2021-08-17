@@ -29,7 +29,7 @@
 
 #ifdef MOCK_PINS_COUNT
 #include "ArduinoCI/SD_CI.h"
-#define SD SdFat_CI
+#define SdFat SdFat_CI
 #define File File_CI
 #else // MOCK_PINS_COUNT
 
