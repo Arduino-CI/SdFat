@@ -33,16 +33,13 @@ String SdFat_CI::_normalizeFilePath(String inPath) {
 String SdFat_CI::_getCwd() { return _cwd; }
 
 bool SdFat_CI::begin(uint8_t csPin) {
-  std::cout << "SdFat_CI::begin()" << std::endl;
   _didBegin = true;
   return true;
 }
 
 bool SdFat_CI::chdir() {
   assert(_didBegin);
-  std::cout << "SdFat_CI::chdir() - 1" << std::endl;
   _cwd = String("/");
-  std::cout << "SdFat_CI::chdir() - 2" << std::endl;
   return true;
 }
 
@@ -72,18 +69,13 @@ bool SdFat_CI::exists(const String &path) {
 }
 
 bool SdFat_CI::format() {
-  std::cout << "SdFat_CI::format() - 1" << std::endl;
   assert(_didBegin);
   dirs.clear();
-  std::cout << "SdFat_CI::format() - 2" << std::endl;
   dirs.emplace("/");
-  std::cout << "SdFat_CI::format() - 3" << std::endl;
   for (auto const &each : files) {
     delete each.second;
   }
-  std::cout << "SdFat_CI::format() - 4" << std::endl;
   files.clear();
-  std::cout << "SdFat_CI::format() - 5" << std::endl;
   return this->chdir();
 }
 
