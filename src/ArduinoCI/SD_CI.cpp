@@ -34,6 +34,7 @@ String SdFat_CI::_getCwd() { return _cwd; }
 
 bool SdFat_CI::begin(uint8_t csPin) {
   std::cout << "SdFat_CI::begin()" << std::endl;
+  _didBegin = true;
   return true;
 }
 
