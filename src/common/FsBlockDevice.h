@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011-2020 Bill Greiman
+ * Copyright (c) 2011-2021 Bill Greiman
  * This file is part of the SdFat library for SD memory cards.
  *
  * MIT License
@@ -22,35 +22,12 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-#ifndef ExFatTypes_h
-#define ExFatTypes_h
-#include "ExFatConfig.h"
-
-#if __cplusplus < 201103
-#warning no char16_t
-typedef uint16_t ExChar16_t;
-//  #error C++11 Support required
-#else  // __cplusplus < 201103
-typedef char16_t ExChar16_t;
-#endif  // __cplusplus < 201103
-
-#if USE_EXFAT_UNICODE_NAMES
-/** exFAT API character type */
-typedef ExChar16_t ExChar_t;
-#else  // USE_EXFAT_UNICODE_NAMES
-/** exFAT API character type */
-typedef char ExChar_t;
-#endif  // USE_EXFAT_UNICODE_NAMES
-/**
- * \struct DirPos_t
- * \brief Internal type for position in directory file.
- */
-struct DirPos_t {
-  /** current cluster */
-  uint32_t cluster;
-  /** offset */
-  uint32_t position;
-  /** directory is contiguous */
-  bool     isContiguous;
-};
-#endif  // ExFatTypes_h
+#ifndef FsBlockDevice_h
+#define FsBlockDevice_h
+#include "SdCard/SdCard.h"
+#if HAS_SDIO_CLASS || USE_BLOCK_DEVICE_INTERFACE
+typedef FsBlockDeviceInterface FsBlockDevice;
+#else
+typedef SdCard FsBlockDevice;
+#endif
+#endif  // FsBlockDevice_h
