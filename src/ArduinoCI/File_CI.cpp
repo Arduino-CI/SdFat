@@ -35,6 +35,10 @@ File_CI::File_CI(file_ci *file, oflag_t oflag) {
   }
 }
 
+int File_CI::available() const {
+  return this->size() - this->position();
+}
+
 uint32_t File_CI::available32() const {
   return this->size() - this->position();
 }
