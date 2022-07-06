@@ -37,6 +37,7 @@ public:
 class File_CI {
 public:
   File_CI(file_ci *file = nullptr, oflag_t oflag = 0x00);
+  int available() const;
   uint32_t available32() const;
   bool close();
   void flush();

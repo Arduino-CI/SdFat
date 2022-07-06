@@ -40,6 +40,12 @@ unittest(append) {
   assertEqual("In the beginning God created the heavens and the earth.", bytes);
 }
 
+unittest(available) {
+  assertEqual(0, file.position());
+  assertEqual(20, file.size());
+  assertEqual(20, file.available());
+}
+
 unittest(available32) {
   assertEqual(0, file.position());
   assertEqual(20, file.size());
