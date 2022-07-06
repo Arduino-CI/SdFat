@@ -347,17 +347,6 @@ class SdBase : public Vol {
     return false;
   }
   //----------------------------------------------------------------------------
-  /** Set SPI sharing state
-   * \param[in] value desired state.
-   * \return true for success else false;
-   */
-  bool setDedicatedSpi(bool value) {
-    if (m_card) {
-      return m_card->setDedicatedSpi(value);
-    }
-    return false;
-  }
-  //----------------------------------------------------------------------------
   /** \return pointer to base volume */
   Vol *vol() { return reinterpret_cast<Vol *>(this); }
   //----------------------------------------------------------------------------
