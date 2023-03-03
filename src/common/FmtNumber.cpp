@@ -30,7 +30,9 @@
 #ifdef __AVR__
 #include <avr/pgmspace.h>
 #ifndef __x86_64__
+#ifndef __aarch64__
 #define USE_STIMMER
+#endif  // __aarch64__
 #endif  // __x86_64__
 #endif  // __AVR__
 //------------------------------------------------------------------------------
